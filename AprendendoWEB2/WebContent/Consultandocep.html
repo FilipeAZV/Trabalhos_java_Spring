@@ -1,0 +1,105 @@
+<!--caixa de texto, permite que o user interaja com a página-->
+
+<!--Métodos usados entre o JSON e o Server: 
+GET- Consultar
+POST- Inserir um dado novo, cadastrar
+PUT- Alterar uma informação já existente
+DELETE- apagar-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Consultando CEP</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+	integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+	crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+	integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+	crossorigin="anonymous"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+	integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+	crossorigin="anonymous"></script>
+<script
+	src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+	integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+	crossorigin="anonymous"></script>
+</head>
+<body>
+
+	<div class="container">
+		<h2>Consultando CEP no ViaCEP</h2>
+		<form onsubmit="return false;">
+			<div class="form-group">
+				<label>CEP:</label> <input class="form-control" type="number"
+					id="inputCEP">
+			</div>
+			<div class="form-group">
+				<label>Rua:</label> <input class="form-control" type="text"
+					id="inputRua">
+			</div>
+			<div class="form-group">
+				<label>Bairro:</label> <input class="form-control" type="text"
+					id="inputBairro">
+			</div>
+			<div class="form-group">
+				<label>Cidade:</label> <input class="form-control" type="text"
+					id="inputCidade">
+			</div>
+			<div class="form-group">
+				<label>Estado:</label> <input class="form-control" type="text"
+					id="inputEstado">
+			</div>
+			<button class="btn btn-primary" onclick="pesquisarCEP()">Pesquisar</button>
+		</form>
+		<br>
+		<div id="resultado"></div>
+	</div>
+
+	<script type="text/javascript">
+		async function pesquisarCEP() {
+			var cep = document.getElementById('inputCEP').value;
+			if (cep.length == 8) {
+				var response = await
+				fetch('https://viacep.com.br/ws/' + cep + '/json/', {
+					method : 'GET',
+					//body: myBody, // string or object
+					headers : {
+						'Content-Type' : 'application/json'
+					}
+				});
+				var cepJson = await	response.json();
+				console.log(cepJson);
+				console.log(response);
+				if (cepJson.erro) {
+					document.getElementById('inputRua').value = "";
+					document.getElementById('inputBairro').value = "";
+					document.getElementById('inputCidade').value = "";
+					document.getElementById('inputEstado').value = "";
+					document.getElementById('resultado').innerHTML = '<p>CEP não encontrado!</p>';
+				} else {
+					document.getElementById('inputRua').value = cepJson.logradouro;
+					document.getElementById('inputBairro').value = cepJson.bairro;
+					document.getElementById('inputCidade').value = cepJson.localidade;
+					document.getElementById('inputEstado').value = cepJson.uf;
+					var htmlResultado = '';
+					htmlResultado += '<p>Rua: ' + cepJson.logradouro + '</p>';
+					htmlResultado += '<p>Bairro: ' + cepJson.bairro + '</p>';
+					htmlResultado += '<p>Cidade: ' + cepJson.localidade	+ '</p>';
+					htmlResultado += '<p>Estado: ' + cepJson.uf + '</p>';
+					document.getElementById('resultado').innerHTML = htmlResultado;
+				}
+
+			} else {
+				alert("CEP inválido!");
+			}
+
+		}
+	</script>
+
+</body>
+</html>
